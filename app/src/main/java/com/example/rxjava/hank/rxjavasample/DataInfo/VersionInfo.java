@@ -1,4 +1,4 @@
-package com.example.rxjava.hank.rxjavasample;
+package com.example.rxjava.hank.rxjavasample.DataInfo;
 
 import com.google.gson.JsonObject;
 

@@ -2,6 +2,9 @@ package com.example.rxjava.hank.rxjavasample;
 
 import android.util.Log;
 
+import com.example.rxjava.hank.rxjavasample.DataInfo.VersionInfo;
+import com.example.rxjava.hank.rxjavasample.Helper.RetrofitHelper;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,6 +19,13 @@ public class ApiSource {
     public interface ApiService {
         @POST("/api_v1/version")
         Flowable<VersionInfo> postVersion(@Body RequestBody body);
+
+        /**
+         * 如果回傳 Json 要自己 parse
+         * 用 Flowable<Object> 再把 Object 自己轉回 json，自己 parse
+         */
+        @POST("/api_v1/show_stations")
+        Flowable<Object> postStation(@Body RequestBody body);
     }
 
     private ApiService apiService;
@@ -31,7 +41,7 @@ public class ApiSource {
 
     public ApiSource() {
         Log.d("msg", "create ApiSource");
-        apiService = RetrofitHelper.getVersion().create(ApiService.class);
+        apiService = RetrofitHelper.getRetrofit().create(ApiService.class);
     }
 
     public Flowable<VersionInfo> postVersion(String device) {
@@ -45,6 +55,12 @@ public class ApiSource {
         RequestBody body = RequestBody.create(MEDIA_TYPE, jsonObject.toString());
         Log.d("msg", "requestBody: " + body);
         return apiService.postVersion(body);
+    }
+
+    public Flowable<Object> postStation() {
+        JSONObject jsonObject = new JSONObject();
+        RequestBody body = RequestBody.create(MEDIA_TYPE, jsonObject.toString());
+        return apiService.postStation(body);
     }
 
 }
