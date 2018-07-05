@@ -1,0 +1,32 @@
+package com.example.rxjava.hank.rxjavasample;
+
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class RetrofitHelper {
+
+    public static String API_DOMAIN = "http://test-bike.infinitas.tech";
+    private static OkHttpClient mOkHttpClient;
+
+    public static Retrofit getVersion() {
+        return new Retrofit.Builder()
+                .baseUrl(API_DOMAIN)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .client(getOkHttpClient())
+                .build();
+    }
+
+    public static OkHttpClient getOkHttpClient() {
+        if (null == mOkHttpClient) {
+            mOkHttpClient = new OkHttpClient.Builder()
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .build();
+        }
+        return mOkHttpClient;
+    }
+}
