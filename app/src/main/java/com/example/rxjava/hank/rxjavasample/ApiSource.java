@@ -45,7 +45,6 @@ public class ApiSource {
     }
 
     public Flowable<VersionInfo> postVersion(String device) {
-        Log.d("msg", "postVersion: " + device);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("device", "android");
@@ -53,7 +52,6 @@ public class ApiSource {
             e.printStackTrace();
         }
         RequestBody body = RequestBody.create(MEDIA_TYPE, jsonObject.toString());
-        Log.d("msg", "requestBody: " + body);
         return apiService.postVersion(body);
     }
 
