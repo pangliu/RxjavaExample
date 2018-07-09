@@ -8,7 +8,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.example.rxjava.hank.rxjavasample.Fragment.Presenter.VersionContract;
+import com.example.rxjava.hank.rxjavasample.Fragment.Presenter.VersionPresenter;
 import com.example.rxjava.hank.rxjavasample.R;
 
 /**
@@ -19,17 +23,13 @@ import com.example.rxjava.hank.rxjavasample.R;
  * Use the {@link FragmentTest1#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentTest1 extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class FragmentTest1 extends Fragment implements VersionContract.view{
 
 //    private OnFragmentInteractionListener mListener;
+    private Context mContext;
+    private TextView tvVersion;
+    private Button btnGetVersion;
+    private VersionPresenter mPresenter;
 
     public FragmentTest1() {
         // Required empty public constructor
@@ -47,8 +47,6 @@ public class FragmentTest1 extends Fragment {
     public static FragmentTest1 newInstance(String param1, String param2) {
         FragmentTest1 fragment = new FragmentTest1();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,18 +60,24 @@ public class FragmentTest1 extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("msg", "fragment1 onCreate");
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        mContext = getActivity();
+        mPresenter = new VersionPresenter(mContext, this);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d("msg", "fragment1 onCreateView");
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_test1, container, false);
+        View view = inflater.inflate(R.layout.fragment_test1, container, false);
+        tvVersion = (TextView) view.findViewById(R.id.tv_version);
+        btnGetVersion = (Button) view.findViewById(R.id.btn_get_version);
+        btnGetVersion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPresenter.getVersion();
+            }
+        });
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -87,12 +91,6 @@ public class FragmentTest1 extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d("msg", "fragment1 onAttach");
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
@@ -112,6 +110,16 @@ public class FragmentTest1 extends Fragment {
         super.onDetach();
         Log.d("msg", "fragment1 onDetach");
 //        mListener = null;
+    }
+
+    @Override
+    public void updateVersion() {
+
+    }
+
+    @Override
+    public void showVersion(String versionString) {
+        tvVersion.setText(versionString);
     }
 
     /**

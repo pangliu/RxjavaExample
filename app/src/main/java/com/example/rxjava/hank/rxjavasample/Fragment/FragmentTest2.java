@@ -95,6 +95,11 @@ public class FragmentTest2 extends Fragment {
 //        }
     }
 
+    protected void onResum() {
+        super.onResume();
+        Log.d("msg", "ft1 onResume");
+    }
+
     @Override
     public void onStop() {
         super.onStop();

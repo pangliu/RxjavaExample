@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getData();
+//        getData();
     }
 
     private void findView() {
@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToFragment(FragmentTest1.newInstance(), null);
+//                goToFragment(FragmentTest1.newInstance(), null);
+                getData();
             }
         });
         btnF1 = (Button) findViewById(R.id.btn_fragment1);
@@ -101,10 +102,6 @@ public class MainActivity extends AppCompatActivity {
             switch (view.getId()) {
                 case R.id.btn_fragment1:
                     selectedFlag = FLAG_FRAGMENT_1;
-//                    FragmentTest1 ft1 = FragmentTest1.newInstance();
-//                    if(ft1.isAdded()) {
-//
-//                    }
                     Log.d("msg", "ft1");
                     break;
                 case R.id.btn_fragment2:
@@ -201,16 +198,4 @@ public class MainActivity extends AppCompatActivity {
         mCompositeDisposable.add(getVersionDisposable);
     }
 
-    private void goToFragment(Fragment toFragment, Fragment fromFragment) {
-        if(null == toFragment) {
-            return;
-        }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if(null != fromFragment) {
-            transaction.hide(fromFragment).add(R.id.container, toFragment);
-        } else {
-            transaction.add(R.id.container, toFragment);
-        }
-        transaction.commit();
-    }
 }
