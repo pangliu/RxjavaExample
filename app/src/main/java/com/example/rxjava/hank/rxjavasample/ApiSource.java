@@ -2,6 +2,7 @@ package com.example.rxjava.hank.rxjavasample;
 
 import android.util.Log;
 
+import com.example.rxjava.hank.rxjavasample.DataInfo.StationInfo;
 import com.example.rxjava.hank.rxjavasample.DataInfo.VersionInfo;
 import com.example.rxjava.hank.rxjavasample.Helper.RetrofitHelper;
 
@@ -26,6 +27,9 @@ public class ApiSource {
          */
         @POST("/api_v1/show_stations")
         Flowable<Object> postStation(@Body RequestBody body);
+
+        @POST("/api_v1/show_stations")
+        Flowable<StationInfo> postStationInfo(@Body RequestBody body);
     }
 
     private ApiService apiService;
@@ -59,6 +63,12 @@ public class ApiSource {
         JSONObject jsonObject = new JSONObject();
         RequestBody body = RequestBody.create(MEDIA_TYPE, jsonObject.toString());
         return apiService.postStation(body);
+    }
+
+    public Flowable<StationInfo> postStationInfo() {
+        JSONObject jsonObject = new JSONObject();
+        RequestBody body = RequestBody.create(MEDIA_TYPE, jsonObject.toString());
+        return apiService.postStationInfo(body);
     }
 
 }

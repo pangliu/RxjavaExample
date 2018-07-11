@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.rxjava.hank.rxjavasample.DataInfo.StationInfo;
 import com.example.rxjava.hank.rxjavasample.DataInfo.VersionInfo;
 import com.example.rxjava.hank.rxjavasample.Fragment.FragmentTest1;
 import com.example.rxjava.hank.rxjavasample.Fragment.FragmentTest2;
@@ -183,7 +184,27 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject json = new JSONObject(s.toString());
 //                        Log.d("msg", "station json: " + json);
                         JSONArray datas = json.getJSONArray("datas");
-                        Log.d("msg", "station json: " + datas.getString(1));
+//                        Log.d("msg", "station json: " + datas.getString(1));
+                        isGetStation = true;
+                        if(isGetVersion && isGetStation) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.d("msg", "throwable: " + throwable);
+                    }
+                });
+        mCompositeDisposable.add(getVersionDisposable);
+        getVersionDisposable = ApiSource.getInstance().postStationInfo()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<StationInfo>() {
+                    @Override
+                    public void accept(StationInfo info) throws Exception {
+//                        Log.d("msg", "Station: " + s);
+                        Log.d("msg", "station status: " + info.toString());
                         isGetStation = true;
                         if(isGetVersion && isGetStation) {
                             progressBar.setVisibility(View.INVISIBLE);

@@ -33,7 +33,7 @@ public class VersionPresenter implements VersionContract.presenter{
                     @Override
                     public void accept(VersionInfo s) throws Exception {
                         Log.d("msg", "getVersion: " + s.toString());
-                        mView.showVersion(s.getVersion());
+                        mView.showVersion(s);
                     }
                 }, new Consumer<Throwable>() {
                     @Override

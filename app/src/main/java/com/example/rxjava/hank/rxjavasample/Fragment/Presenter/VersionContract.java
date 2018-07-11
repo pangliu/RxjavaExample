@@ -1,5 +1,7 @@
 package com.example.rxjava.hank.rxjavasample.Fragment.Presenter;
 
+import com.example.rxjava.hank.rxjavasample.DataInfo.VersionInfo;
+
 public interface VersionContract {
 
     interface presenter {
@@ -8,6 +10,6 @@ public interface VersionContract {
 
     interface view {
         void updateVersion();
-        void showVersion(String versionString);
+        void showVersion(VersionInfo versionInfo);
     }
 }

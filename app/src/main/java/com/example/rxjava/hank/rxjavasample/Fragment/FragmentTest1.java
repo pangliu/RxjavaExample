@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.rxjava.hank.rxjavasample.DataInfo.VersionInfo;
+import com.example.rxjava.hank.rxjavasample.Dialog.LoadingDialog;
 import com.example.rxjava.hank.rxjavasample.Fragment.Presenter.VersionContract;
 import com.example.rxjava.hank.rxjavasample.Fragment.Presenter.VersionPresenter;
 import com.example.rxjava.hank.rxjavasample.R;
@@ -30,6 +32,7 @@ public class FragmentTest1 extends Fragment implements VersionContract.view{
     private TextView tvVersion;
     private Button btnGetVersion;
     private VersionPresenter mPresenter;
+    private LoadingDialog loadingDialog;
 
     public FragmentTest1() {
         // Required empty public constructor
@@ -62,6 +65,7 @@ public class FragmentTest1 extends Fragment implements VersionContract.view{
         Log.d("msg", "fragment1 onCreate");
         mContext = getActivity();
         mPresenter = new VersionPresenter(mContext, this);
+        loadingDialog = new LoadingDialog(mContext);
     }
 
     @Override
@@ -74,6 +78,7 @@ public class FragmentTest1 extends Fragment implements VersionContract.view{
         btnGetVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                loadingDialog.show();
                 mPresenter.getVersion();
             }
         });
@@ -118,20 +123,11 @@ public class FragmentTest1 extends Fragment implements VersionContract.view{
     }
 
     @Override
-    public void showVersion(String versionString) {
-        tvVersion.setText(versionString);
+    public void showVersion(VersionInfo versionInfo) {
+        tvVersion.setText("版本號: " + versionInfo.getVersion());
+        loadingDialog.dismiss();
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
