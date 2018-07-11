@@ -102,10 +102,14 @@ public class MainActivity extends AppCompatActivity {
 
             switch (view.getId()) {
                 case R.id.btn_fragment1:
+                    btnF1.setSelected(true);
+                    btnF2.setSelected(false);
                     selectedFlag = FLAG_FRAGMENT_1;
                     Log.d("msg", "ft1");
                     break;
                 case R.id.btn_fragment2:
+                    btnF1.setSelected(false);
+                    btnF2.setSelected(true);
                     Log.d("msg", "ft2");
                     selectedFlag = FLAG_FRAGMENT_2;
                     break;
