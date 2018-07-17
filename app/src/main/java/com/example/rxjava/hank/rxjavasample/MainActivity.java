@@ -53,18 +53,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findView();
-        initFragment();
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+//        Log.d("msg", "onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("msg", "onResume");
 //        getData();
+        initFragment();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("msg", "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("msg", "onDestroy");
+        NOW_FLAG = -1;
     }
 
     private void findView() {
@@ -91,9 +107,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initFragment() {
-        fragmentArrayList = new ArrayList<Fragment>();
-        fragmentArrayList.add(FragmentTest1.newInstance());
-        fragmentArrayList.add(FragmentTest2.newInstance());
+        if(null == fragmentArrayList || 0 == fragmentArrayList.size()) {
+            fragmentArrayList = new ArrayList<Fragment>();
+            fragmentArrayList.add(FragmentTest1.newInstance());
+            fragmentArrayList.add(FragmentTest2.newInstance());
+        }
+        Log.d("msg", "fragmentArrayList size: " + fragmentArrayList.size());
     }
 
     private View.OnClickListener onBtnCallback = new View.OnClickListener() {
@@ -120,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
             }
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             Fragment selectedFragment = fragmentArrayList.get(selectedFlag);
+            Log.d("msg", "NOW_FLAG: " + NOW_FLAG);
             if(NOW_FLAG == -1) {
                 // 目前沒有任何 fragment 被 add;
                 Log.d("msg", "目前沒有任何 fragment add");
@@ -131,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                  * 目前已有 fragment，要判斷當前 fragment 是否為所選之 fragment
                  */
                 Fragment nowfragment = getSupportFragmentManager().findFragmentByTag(fragmentArrayList.get(NOW_FLAG).getClass().getName());
+                Log.d("msg", "nowfragment: " + nowfragment.getTag());
                 if(selectedFlag != NOW_FLAG) {
                     if(selectedFragment.isAdded()) {
                         // 所選的 fragment 曾經被加入過
