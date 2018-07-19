@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                goToFragment(FragmentTest1.newInstance(), null);
                 getData();
             }
         });
