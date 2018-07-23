@@ -59,14 +59,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-//        Log.d("msg", "onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d("msg", "onResume");
-//        getData();
         initFragment();
     }
 

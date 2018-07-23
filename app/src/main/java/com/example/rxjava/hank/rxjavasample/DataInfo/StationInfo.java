@@ -1,5 +1,8 @@
 package com.example.rxjava.hank.rxjavasample.DataInfo;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,7 +13,12 @@ public class StationInfo {
 
     private String msg, lang;
     private int status;
-    private ArrayList<Data> datas;
+    /**
+     * 命名要與回傳 json key 一樣，不然無法對應會拋出 Exception
+     */
+    private ArrayList<Station> datas;
+
+    public StationInfo(){}
 
     public int getStatus() {
         return status;
@@ -36,17 +44,17 @@ public class StationInfo {
         this.lang = lang;
     }
 
-    public ArrayList<Data> getData() {
+    public ArrayList<Station> getStation() {
         return datas;
     }
 
-    public void setData(ArrayList<Data> datas) {
-        this.datas = datas;
+    public void setStation(ArrayList<Station> stations) {
+        this.datas = stations;
     }
 
     public JSONArray getJsonArrayData() {
         JSONArray array = new JSONArray();
-        for(Data item: datas) {
+        for(Station item: datas) {
             try {
                 JSONObject json = new JSONObject(item.toString());
                 array.put(json);
@@ -61,7 +69,7 @@ public class StationInfo {
     public String toString() {
         JSONObject json = new JSONObject();
         try {
-            json.put("data", getJsonArrayData());
+            json.put("datas", getJsonArrayData());
             json.put("msg", msg);
             json.put("lang", lang);
             json.put("status", status);
@@ -71,11 +79,31 @@ public class StationInfo {
         return json.toString();
     }
 
-    public class Data {
-        private int id, lockNum, lockMax;
-        private String lat, lon, name;
+    @DatabaseTable(tableName = "station")
+    public static class Station {
+        @DatabaseField(id = true, columnName = "id")
+        private int id;
+        private int lockNum;
+        private int lockMax;
+        @DatabaseField(columnName = "lat")
+        private String lat;
+        @DatabaseField(columnName = "lon")
+        private String lon;
+        @DatabaseField(columnName = "name")
+        private String name;
 
-        public int getId() {
+        public Station() { }
+
+        public Station(int id, int lockNum, int lockMax, String lat, String lon, String name) {
+            this.id = id;
+            this.lockNum = lockNum;
+            this.lockMax = lockMax;
+            this.lat = lat;
+            this.lon = lon;
+            this.name = name;
+        }
+
+        private int getId() {
             return id;
         }
 
