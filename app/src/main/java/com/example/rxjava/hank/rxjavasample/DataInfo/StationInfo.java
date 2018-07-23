@@ -79,6 +79,10 @@ public class StationInfo {
         return json.toString();
     }
 
+    /**
+     * Station 要宣告為 static 不然在 DatabaseHelper 會無法被 new 出來
+     * 不然就要獨立一個 class
+     */
     @DatabaseTable(tableName = "station")
     public static class Station {
         @DatabaseField(id = true, columnName = "id")

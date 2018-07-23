@@ -21,6 +21,7 @@ import com.example.rxjava.hank.rxjavasample.R;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class FragmentTest2 extends Fragment implements StationContract.view{
@@ -70,25 +71,20 @@ public class FragmentTest2 extends Fragment implements StationContract.view{
             @Override
             public void onClick(View view) {
                 loadingDialog.show();
-                mPresenter.getStation();
+                mPresenter.getStationFromApi();
             }
         });
 
         btnShowDb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                try {
-                    StationDao stationDao = new StationDao(mContext);
-                    ArrayList<StationInfo.Station> stations = (ArrayList<StationInfo.Station>) stationDao.getAllStation();
-                    for(StationInfo.Station item:stations){
-                        Log.d("msg", "item: " + item.toString());
-                    }
-//                    tvStationFromDb.setText(station.getName());
-//                } catch (SQLException e) {
-//                    Log.d("msg", "read to Db SQLException: " + e);
-//                    e.printStackTrace();
+//                StationDao stationDao = new StationDao(mContext);
+//                ArrayList<StationInfo.Station> stations = (ArrayList<StationInfo.Station>) stationDao.getAllStation();
+//                for(StationInfo.Station item:stations){
+//                    Log.d("msg", "item: " + item.toString());
 //                }
-                tvStationFromDb.setText(stations.toString());
+//                tvStationFromDb.setText(stations.toString());
+                mPresenter.getStationFromDb();
             }
         });
         return view;
@@ -114,24 +110,20 @@ public class FragmentTest2 extends Fragment implements StationContract.view{
     }
 
     @Override
-    public void showStation(StationInfo stationInfo, int errorCode) {
+    public void showStationFromApi(StationInfo stationInfo, int errorCode) {
         Log.d("msg","fragment showStation error: " + errorCode);
         loadingDialog.dismiss();
         if(null != stationInfo) {
             // 測試寫入 DB
-//            try {
-//                StationInfo.Station station = stationInfo.getStation().get(0);
-//                Log.d("msg","station: " + station);
-//                StationDao stationDao = new StationDao(mContext);
-//                stationDao.add(station);
-//            } catch (Exception e) {
-//                Log.d("msg", "Exception: " + e);
-//            }
-            StationDao stationDao = new StationDao(mContext);
-            stationDao.createWithTransaction(stationInfo.getStation());
             tvStation.setText(stationInfo.getStation().toString());
+            mPresenter.writeStationToDb(stationInfo.getStation());
         } else {
             tvStation.setText("取得資料失敗");
         }
+    }
+
+    @Override
+    public void showStationFromDb(List<StationInfo.Station> stations) {
+        tvStationFromDb.setText(stations.toString());
     }
 }

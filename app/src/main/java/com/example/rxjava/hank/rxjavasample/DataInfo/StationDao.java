@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+
 public class StationDao {
 
     private Context mContext;
@@ -30,7 +35,7 @@ public class StationDao {
         }
     }
 
-    public void add(StationInfo.Station station) {
+    private void add(StationInfo.Station station) {
         try {
             Log.d("msg", "dao add station: " + station.toString());
             stationDaoOpe.createOrUpdate(station);
@@ -42,7 +47,7 @@ public class StationDao {
         }
     }
 
-    public void createWithTransaction(final List<StationInfo.Station> stations) {
+    private void createWithTransaction(final List<StationInfo.Station> stations) {
         try {
             TransactionManager.callInTransaction(databaseHelper.getConnectionSource(), new Callable<Void>() {
                 @Override
@@ -60,7 +65,7 @@ public class StationDao {
         }
     }
 
-    public List<StationInfo.Station> getAllStation() {
+    private List<StationInfo.Station> getAllStation() {
         List<StationInfo.Station> stations = new ArrayList<StationInfo.Station>();
         try {
             stations = stationDaoOpe.queryForAll();
@@ -68,5 +73,31 @@ public class StationDao {
             e.printStackTrace();
         }
         return stations;
+    }
+
+    public Flowable<List<StationInfo.Station>> getStations() {
+        Flowable<List<StationInfo.Station>> flowable = Flowable.create(new FlowableOnSubscribe<List<StationInfo.Station>>() {
+            @Override
+            public void subscribe(FlowableEmitter<List<StationInfo.Station>> e) throws Exception {
+                Log.d("msg", "threadName: " + Thread.currentThread().getName());
+                List<StationInfo.Station> stations = getAllStation();
+                Log.d("msg", "getStation: " + stations.toString());
+                e.onNext(stations);
+            }
+        }, BackpressureStrategy.ERROR);
+        return flowable;
+    }
+
+    public Flowable<Integer> writeStations(final List<StationInfo.Station> stations) {
+        Flowable<Integer> flowable = Flowable.create(new FlowableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(FlowableEmitter<Integer> e) throws Exception {
+                Log.d("msg", "threadName: " + Thread.currentThread().getName());
+                createWithTransaction(stations);
+                Log.d("msg", "write to db");
+                e.onNext(0);
+            }
+        }, BackpressureStrategy.ERROR);
+        return flowable;
     }
 }

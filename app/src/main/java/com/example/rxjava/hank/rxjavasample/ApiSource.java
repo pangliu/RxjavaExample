@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.rxjava.hank.rxjavasample.DataInfo.StationInfo;
 import com.example.rxjava.hank.rxjavasample.DataInfo.VersionInfo;
 import com.example.rxjava.hank.rxjavasample.Helper.RetrofitHelper;
+import com.j256.ormlite.field.DatabaseField;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ public class ApiSource {
 
         @POST("/api_v1/show_stations")
         Flowable<StationInfo> postStationInfo(@Body RequestBody body);
+
     }
 
     private ApiService apiService;
