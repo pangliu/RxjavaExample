@@ -79,7 +79,7 @@ public class FragmentTest1 extends Fragment implements VersionContract.view{
             @Override
             public void onClick(View view) {
                 loadingDialog.show();
-                mPresenter.getVersion();
+                mPresenter.getVersion("android");
             }
         });
         return view;

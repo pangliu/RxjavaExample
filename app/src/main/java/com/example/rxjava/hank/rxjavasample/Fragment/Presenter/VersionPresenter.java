@@ -25,8 +25,8 @@ public class VersionPresenter implements VersionContract.presenter{
     }
 
     @Override
-    public void getVersion() {
-        Disposable getVersionDisposable = ApiSource.getInstance().postVersion("android")
+    public void getVersion(String platform) {
+        Disposable getVersionDisposable = ApiSource.getInstance().postVersion(platform)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<VersionInfo>() {
