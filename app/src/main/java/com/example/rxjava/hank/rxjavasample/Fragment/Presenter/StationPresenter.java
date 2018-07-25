@@ -71,27 +71,6 @@ public class StationPresenter implements StationContract.presenter{
                     }
                 });
         mCompositeDisposable.add(getStationDisposable);
-//        Disposable getStationDisposable = Flowable.create(new FlowableOnSubscribe<Integer>() {
-//            @Override
-//            public void subscribe(FlowableEmitter<Integer> e) throws Exception {
-//                e.onNext(1);
-//                Log.d("msg", "threadName: " + Thread.currentThread().getName());
-//            }
-//        }, BackpressureStrategy.ERROR)
-//                .subscribeOn(Schedulers.newThread())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Consumer<Integer>() {
-//                    @Override
-//                    public void accept(Integer integer) throws Exception {
-//                        Log.d("msg", "subscribe threadName: " + Thread.currentThread().getName());
-//                    }
-//                }, new Consumer<Throwable>() {
-//                    @Override
-//                    public void accept(Throwable throwable) throws Exception {
-//                        Log.d("msg", "subscribe throwable threadName: " + Thread.currentThread().getName());
-//                    }
-//                });
-//        mCompositeDisposable.add(getStationDisposable);
     }
 
     @Override

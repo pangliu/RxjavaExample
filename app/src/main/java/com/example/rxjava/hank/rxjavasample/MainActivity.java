@@ -1,5 +1,6 @@
 package com.example.rxjava.hank.rxjavasample;
 
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -21,10 +22,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findView();
-
     }
 
     @Override
@@ -68,19 +73,6 @@ public class MainActivity extends AppCompatActivity {
         initFragment();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("msg", "onStop");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("msg", "onDestroy");
-        NOW_FLAG = -1;
-    }
-
     private void findView() {
         tvHello = (TextView)findViewById(R.id.tv_hello);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -90,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getData();
+//                getData();
+                rxJavaTest();
             }
         });
         btnF1 = (Button) findViewById(R.id.btn_fragment1);
@@ -112,69 +105,66 @@ public class MainActivity extends AppCompatActivity {
         Log.d("msg", "fragmentArrayList size: " + fragmentArrayList.size());
     }
 
-    private View.OnClickListener onBtnCallback = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-            switch (view.getId()) {
-                case R.id.btn_fragment1:
-                    btnF1.setSelected(true);
-                    btnF2.setSelected(false);
-                    selectedFlag = FLAG_FRAGMENT_1;
-                    Log.d("msg", "ft1");
-                    break;
-                case R.id.btn_fragment2:
-                    btnF1.setSelected(false);
-                    btnF2.setSelected(true);
-                    Log.d("msg", "ft2");
-                    selectedFlag = FLAG_FRAGMENT_2;
-                    break;
-                case R.id.btn_fragment3:
-                    break;
-                case R.id.btn_fragment4:
-                    break;
-            }
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            Fragment selectedFragment = fragmentArrayList.get(selectedFlag);
-            Log.d("msg", "NOW_FLAG: " + NOW_FLAG);
-            if(NOW_FLAG == -1) {
-                // 目前沒有任何 fragment 被 add;
-                Log.d("msg", "目前沒有任何 fragment add");
-                transaction
-                        .add(R.id.container, selectedFragment, selectedFragment.getClass().getName())
-                        .commit();
-            } else {
-                /**
-                 * 目前已有 fragment，要判斷當前 fragment 是否為所選之 fragment
-                 */
-                Fragment nowfragment = getSupportFragmentManager().findFragmentByTag(fragmentArrayList.get(NOW_FLAG).getClass().getName());
-                Log.d("msg", "nowfragment: " + nowfragment.getTag());
-                if(selectedFlag != NOW_FLAG) {
-                    if(selectedFragment.isAdded()) {
-                        // 所選的 fragment 曾經被加入過
-                        Log.d("msg", "所選的 fragment 曾經被加入過");
-                        transaction
-                                .hide(nowfragment)
-                                .show(selectedFragment)
-                                .commit();
-                    } else {
-                        // 所選的 fragment 不曾加入過
-                        Log.d("msg", "所選的 fragment 不曾加入過");
-                        transaction
-                                .hide(nowfragment)
-                                .add(R.id.container, selectedFragment, selectedFragment.getClass().getName())
-                                .commit();
-                    }
+    private void rxJavaTest() {
+        /**
+         * step1: 宣告一個 observable(被觀察者)
+         * observable: (上游)發送命令，決定異步操作的順序及次數
+         * 在 RxJava2 中以 flowable(支持被壓) 取代 observable
+         */
+        Observable<String> observable = Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                if(emitter.isDisposed()) {
+                    Log.d("msg", "observable isDisposed: " + emitter.isDisposed());
+                    return;
                 }
+                // 異步處理: call api or access DB
+                Log.d("msg", "observable thread: " + Thread.currentThread().getName());
+                SystemClock.sleep(2000);
+                emitter.onNext("next");
+                SystemClock.sleep(2000);
+                emitter.onNext("hello world");
+                SystemClock.sleep(2000);
+                emitter.onNext("haha");
+                emitter.onComplete();
             }
-            NOW_FLAG = selectedFlag;
-        }
-    };
+        });
+        /**
+         * step2: 宣告一個 observer(觀察者)
+         * observer: (下游)可在不同 thread 執行，等待 observable 的通知
+         */
+        DisposableObserver<String> observer = new DisposableObserver<String>() {
+            @Override
+            public void onNext(String s) {
+                Log.d("msg", "observer thread: " + Thread.currentThread().getName());
+                Log.d("msg", "onNext: " + s);
+            }
+            @Override
+            public void onError(Throwable e) {
+                Log.d("msg", "onNext: " + e);
+            }
+            @Override
+            public void onComplete() {
+                Log.d("msg", "onComplete");
+            }
+        };
+        /**
+         * step3: 訂閱事件
+         */
+        observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+        /**
+         * step4: 將需要被管理的 observer(觀察者) 加入管理集合
+         */
+        mCompositeDisposable.add(observer);
+    }
 
     private void getData() {
         Log.d("msg", "getData");
         progressBar.setVisibility(View.VISIBLE);
         // 呼叫 getVersion api
+
         Disposable getVersionDisposable = ApiSource.getInstance().postVersion("android")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -241,4 +231,75 @@ public class MainActivity extends AppCompatActivity {
         mCompositeDisposable.add(getVersionDisposable);
     }
 
+    private View.OnClickListener onBtnCallback = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.btn_fragment1:
+                    btnF1.setSelected(true);
+                    btnF2.setSelected(false);
+                    selectedFlag = FLAG_FRAGMENT_1;
+                    Log.d("msg", "ft1");
+                    break;
+                case R.id.btn_fragment2:
+                    btnF1.setSelected(false);
+                    btnF2.setSelected(true);
+                    Log.d("msg", "ft2");
+                    selectedFlag = FLAG_FRAGMENT_2;
+                    break;
+                case R.id.btn_fragment3:
+                    break;
+                case R.id.btn_fragment4:
+                    break;
+            }
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            Fragment selectedFragment = fragmentArrayList.get(selectedFlag);
+            Log.d("msg", "NOW_FLAG: " + NOW_FLAG);
+            if(NOW_FLAG == -1) {
+                // 目前沒有任何 fragment 被 add;
+                Log.d("msg", "目前沒有任何 fragment add");
+                transaction
+                        .add(R.id.container, selectedFragment, selectedFragment.getClass().getName())
+                        .commit();
+            } else {
+                /**
+                 * 目前已有 fragment，要判斷當前 fragment 是否為所選之 fragment
+                 */
+                Fragment nowfragment = getSupportFragmentManager().findFragmentByTag(fragmentArrayList.get(NOW_FLAG).getClass().getName());
+                Log.d("msg", "nowfragment: " + nowfragment.getTag());
+                if(selectedFlag != NOW_FLAG) {
+                    if(selectedFragment.isAdded()) {
+                        // 所選的 fragment 曾經被加入過
+                        Log.d("msg", "所選的 fragment 曾經被加入過");
+                        transaction
+                                .hide(nowfragment)
+                                .show(selectedFragment)
+                                .commit();
+                    } else {
+                        // 所選的 fragment 不曾加入過
+                        Log.d("msg", "所選的 fragment 不曾加入過");
+                        transaction
+                                .hide(nowfragment)
+                                .add(R.id.container, selectedFragment, selectedFragment.getClass().getName())
+                                .commit();
+                    }
+                }
+            }
+            NOW_FLAG = selectedFlag;
+        }
+    };
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("msg", "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("msg", "onDestroy");
+        mCompositeDisposable.clear();
+        NOW_FLAG = -1;
+    }
 }
