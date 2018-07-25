@@ -75,6 +75,10 @@ public class StationDao {
         return stations;
     }
 
+    /**
+     * 將讀寫 DB 部分改用 Rx 架構
+     * @return
+     */
     public Flowable<List<StationInfo.Station>> getStations() {
         Flowable<List<StationInfo.Station>> flowable = Flowable.create(new FlowableOnSubscribe<List<StationInfo.Station>>() {
             @Override
